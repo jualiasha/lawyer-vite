@@ -14,6 +14,16 @@
   -webkit-text-size-adjust: 100%;
 }
 
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -29,6 +39,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  color: #000
 }
 
 @media (prefers-color-scheme: light) {
