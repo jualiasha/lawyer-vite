@@ -2,11 +2,8 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
   color: #000;
   background-color: #f2f3f5;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -32,11 +29,7 @@ html {
 
 a {
   font-weight: 500;
-  color: var(--lawyer-light-blue);
   text-decoration: none;
-}
-a:hover {
-  color: var(--lawyer-bright-blue);
 }
 
 ul {
@@ -45,8 +38,5 @@ ul {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-height: 100vh;
 }
 
