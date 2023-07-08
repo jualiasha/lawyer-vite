@@ -3,6 +3,8 @@ import { customElement, property, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { when } from "lit/directives/when.js";
 
+const HOME: string = "/index.html";
+
 @customElement("main-menu")
 export class MainMenu extends LitElement {
   /**
@@ -16,6 +18,12 @@ export class MainMenu extends LitElement {
   @property({ type: Boolean })
   companiesMenuVisible: boolean = false;
 
+  /**
+   * current location.
+   */
+  @property({ type: String })
+  currentLocation: string = "";
+
   @state()
   private _home: HTMLElement | null = null;
   private _companies: HTMLElement | null = null;
@@ -24,17 +32,24 @@ export class MainMenu extends LitElement {
   private _contacts: HTMLElement | null = null;
   private _header: HTMLElement | null = null;
 
+  protected willUpdate(_changedProperties: PropertyValues) {
+    console.log(_changedProperties, this.currentLocation === HOME);
+  }
+
   render() {
-    const classes = {
+    const openMenuClasses = {
       "menu-visible": this.menuOpened,
       "menu-hidden": !this.menuOpened,
     };
+    const homeLocation = {
+      "current-link": this.currentLocation === HOME,
+    };
     return html`
-      <header class="${classMap(classes)}">
+      <header class="${classMap(openMenuClasses)}">
         <nav>
           <ul class="title-list">
             <li id="home">
-              <a href="/index.html">Home</a>
+              <a class="${classMap(homeLocation)}" href="/index.html">Home</a>
             </li>
             <li id="companies">Companies</li>
             <li id="individuals">Individuals</li>
@@ -68,10 +83,6 @@ export class MainMenu extends LitElement {
     this._reviews = this.renderRoot.querySelector("#reviews");
     this._contacts = this.renderRoot.querySelector("#contacts");
     this._header = this.renderRoot.querySelector("header");
-    this._home?.addEventListener(
-      "mouseover",
-      this._handleMenuHover.bind(this, "home")
-    );
     this._companies?.addEventListener(
       "mouseover",
       this._handleMenuHover.bind(this, "companies")
@@ -92,6 +103,8 @@ export class MainMenu extends LitElement {
       "mouseleave",
       this._handleMenuLeave.bind(this)
     );
+    console.log(window.location.pathname, new URLSearchParams());
+    this.currentLocation = window.location.pathname;
   }
 
   private _handleMenuLeave() {
@@ -148,11 +161,14 @@ export class MainMenu extends LitElement {
     super.disconnectedCallback();
   }
 
-  updated() {
-    debugger;
-  }
+  // updated() {
+  //   debugger;
+  // }
 
   static styles = css`
+    header {
+      background-color: var(--white) !important;
+    }
     .title-list {
       display: flex;
       justify-content: center;
@@ -161,9 +177,24 @@ export class MainMenu extends LitElement {
       display: inline;
       margin: 0 2rem;
       font-size: 1.1rem;
+      cursor: pointer;
+      color: var(--lawyer-dark-blue);
+    }
+    .title-list li:hover {
+      color: var(--lawyer-orane);
     }
     a {
       text-decoration: none;
+    }
+    a:visited {
+      color: var(--lawyer-dark-blue);
+    }
+    a:hover {
+      color: var(--lawyer-orane);
+    }
+
+    .current-link {
+      color: var(--lawyer-orane) !important;
     }
 
     @keyframes backgroundMoveForward {
@@ -194,10 +225,10 @@ export class MainMenu extends LitElement {
         height: 5rem;
       }
       75% {
-        height: 3rem;
+        height: 4rem;
       }
       100% {
-        height: 1rem;
+        height: 3rem;
       }
     }
     @keyframes menuListAppearance {
@@ -205,7 +236,7 @@ export class MainMenu extends LitElement {
         color: transparent;
       }
       50% {
-        color: transparent;
+        color: var(--lawyer-dark-blue);
       }
       75% {
         color: var(--lawyer-dark-blue);
@@ -220,22 +251,27 @@ export class MainMenu extends LitElement {
     }
     .menu-list li {
       font-size: 1.5rem;
+    }
+    .menu-list a {
       animation: menuListAppearance 1s ease-in 0s;
       color: var(--lawyer-dark-blue);
+    }
+    .menu-list a:hover {
+      color: var(--lawyer-orane);
     }
     .menu-visible {
       position: absolute;
       top: 0;
       width: 100%;
-      background-color: #fff;
-      animation: backgroundMoveForward 70ms ease-in 0s;
+      background-color: var(--white);
+      animation: backgroundMoveForward 50ms ease-in 0s;
     }
     .menu-hidden {
       position: absolute;
       top: 0;
       width: 100%;
       background-color: transparent;
-      animation: backgroundMoveBackward 70ms ease-out 0s;
+      animation: backgroundMoveBackward 50ms ease-out 0s;
     }
   `;
 }
