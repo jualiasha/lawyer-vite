@@ -3,8 +3,6 @@ import { customElement, property, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { when } from "lit/directives/when.js";
 
-const HOME: string = "/index.html";
-
 @customElement("main-menu")
 export class MainMenu extends LitElement {
   /**
@@ -46,8 +44,19 @@ export class MainMenu extends LitElement {
     this._currentLocation = window.location.pathname;
   }
 
-  protected willUpdate(_changedProperties: PropertyValues) {
-    console.log(_changedProperties, this._currentLocation === HOME);
+  private _checkCurrentLocation(key: string) {
+    switch (key) {
+      case "index":
+        return this._currentLocation.includes("index");
+      case "companies":
+        return this._currentLocation.includes("companies");
+      case "individuals":
+        return this._currentLocation.includes("individuals");
+      case "reviews":
+        return this._currentLocation.includes("reviews");
+      default:
+        return this._currentLocation.includes("contacts");
+    }
   }
 
   render() {
@@ -56,19 +65,19 @@ export class MainMenu extends LitElement {
       "menu-hidden": !this.menuOpened,
     };
     const homeLocation = {
-      "current-link": this._currentLocation === HOME,
+      "current-link": this._checkCurrentLocation("index"),
     };
     const companiesLocation = {
-      "current-link": this._currentLocation.includes("companies"),
+      "current-link": this._checkCurrentLocation("companies"),
     };
     const individualsLocation = {
-      "current-link": this._currentLocation.includes("individuals"),
+      "current-link": this._checkCurrentLocation("individuals"),
     };
     const reviewsLocation = {
-      "current-link": this._currentLocation.includes("reviews"),
+      "current-link": this._checkCurrentLocation("reviews"),
     };
     const contactsLocation = {
-      "current-link": this._currentLocation.includes("contacts"),
+      "current-link": this._checkCurrentLocation("contacts"),
     };
     return html`
       <header class="${classMap(openMenuClasses)}">
