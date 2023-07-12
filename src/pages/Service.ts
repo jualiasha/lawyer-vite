@@ -1,7 +1,7 @@
 import { LitElement, css, html } from 'lit'
 import { customElement } from 'lit/decorators.js'
 import '../components/MainMenu.ts'
-import litLogo from './assets/lit.svg'
+import litLogo from '../assets/lit.svg'
 
 @customElement('service-page')
 export class Service extends LitElement {
@@ -9,7 +9,7 @@ export class Service extends LitElement {
     render() {
         return html`
       <header>
-          <main-menu></main-menu>
+
       </header>
       <main>
           <h1>Service title</h1>

@@ -2,16 +2,20 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: #000;
+  background-color: #f2f3f5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  --lawyer-orane: #FB8500;
+  --lawyer-yellow: #FFB703;
+  --lawyer-dark-blue: #023047;
+  --lawyer-bright-blue: #219EBC;
+  --lawyer-light-blue: #8ECAE6;
+  --white: #fff
+
 }
 
 * {
@@ -26,25 +30,14 @@ html {
 
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  text-decoration: none;
 }
-a:hover {
-  color: #535bf2;
+
+ul {
+  list-style: none;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-  color: #000
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-}
