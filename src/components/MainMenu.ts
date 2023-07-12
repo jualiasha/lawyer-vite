@@ -1,4 +1,4 @@
-import { LitElement, css, html, PropertyValues, nothing } from "lit";
+import { LitElement, css, html, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { classMap } from "lit/directives/class-map.js";
 import { when } from "lit/directives/when.js";
@@ -8,32 +8,46 @@ const HOME: string = "/index.html";
 @customElement("main-menu")
 export class MainMenu extends LitElement {
   /**
-   * Toggling of open and close menu states.
-   */
-  @property({ type: Boolean })
-  menuOpened: boolean = false;
-  /**
    * Toggling of open and close companies' menu.
    */
   @property({ type: Boolean })
   companiesMenuVisible: boolean = false;
 
   /**
-   * current location.
+   * Toggling of open and close individuals' menu.
    */
-  @property({ type: String })
-  currentLocation: string = "";
+  @property({ type: Boolean })
+  individualsMenuVisible: boolean = false;
+
+  /**
+   * Toggling of open and close reviews' menu.
+   */
+  @property({ type: Boolean })
+  reviewsMenuVisible: boolean = false;
+
+  /**
+   * Toggling of open and close contacts' menu.
+   */
+  @property({ type: Boolean })
+  contactsMenuVisible: boolean = false;
 
   @state()
+  public menuOpened: boolean = false;
   private _home: HTMLElement | null = null;
   private _companies: HTMLElement | null = null;
   private _individuals: HTMLElement | null = null;
   private _reviews: HTMLElement | null = null;
   private _contacts: HTMLElement | null = null;
   private _header: HTMLElement | null = null;
+  private _currentLocation: string = "";
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._currentLocation = window.location.pathname;
+  }
 
   protected willUpdate(_changedProperties: PropertyValues) {
-    console.log(_changedProperties, this.currentLocation === HOME);
+    console.log(_changedProperties, this._currentLocation === HOME);
   }
 
   render() {
@@ -42,7 +56,19 @@ export class MainMenu extends LitElement {
       "menu-hidden": !this.menuOpened,
     };
     const homeLocation = {
-      "current-link": this.currentLocation === HOME,
+      "current-link": this._currentLocation === HOME,
+    };
+    const companiesLocation = {
+      "current-link": this._currentLocation.includes("companies"),
+    };
+    const individualsLocation = {
+      "current-link": this._currentLocation.includes("individuals"),
+    };
+    const reviewsLocation = {
+      "current-link": this._currentLocation.includes("reviews"),
+    };
+    const contactsLocation = {
+      "current-link": this._currentLocation.includes("contacts"),
     };
     return html`
       <header class="${classMap(openMenuClasses)}">
@@ -51,38 +77,40 @@ export class MainMenu extends LitElement {
             <li id="home">
               <a class="${classMap(homeLocation)}" href="/index.html">Home</a>
             </li>
-            <li id="companies">Companies</li>
-            <li id="individuals">Individuals</li>
-            <li id="reviews">Reviews</li>
-            <li id="contacts">Contacts</li>
+            <li id="companies" class="${classMap(companiesLocation)}">
+              Companies
+            </li>
+            <li id="individuals" class="${classMap(individualsLocation)}">
+              Individuals
+            </li>
+            <li id="reviews" class="${classMap(reviewsLocation)}">Reviews</li>
+            <li id="contacts" class="${classMap(contactsLocation)}">
+              Contacts
+            </li>
           </ul>
           ${when(
-            this.companiesMenuVisible,
-            () => html`
-              <ul class="menu-list">
-                <li><a href="/service.html">Company Service 1</a></li>
-                <li><a href="/service.html">Company Service 2</a></li>
-                <li><a href="/service.html">Company Service 3</a></li>
-              </ul>
-            `,
-            () => nothing
+            this.companiesMenuVisible ||
+              this.individualsMenuVisible ||
+              this.contactsMenuVisible ||
+              this.reviewsMenuVisible,
+            () => this._handleMenuVisible()
           )}
-          <div id="individuals-menu"></div>
-          <div id="reviews-menu"></div>
-          <div id="contacts-menu"></div>
         </nav>
       </header>
     `;
   }
 
   protected firstUpdated(_changedProperties: PropertyValues) {
-    console.log(_changedProperties);
     this._home = this.renderRoot.querySelector("#home");
     this._companies = this.renderRoot.querySelector("#companies");
     this._individuals = this.renderRoot.querySelector("#individuals");
     this._reviews = this.renderRoot.querySelector("#reviews");
     this._contacts = this.renderRoot.querySelector("#contacts");
     this._header = this.renderRoot.querySelector("header");
+    this._home?.addEventListener(
+      "mouseover",
+      this._handleMenuHover.bind(this, "home")
+    );
     this._companies?.addEventListener(
       "mouseover",
       this._handleMenuHover.bind(this, "companies")
@@ -103,33 +131,91 @@ export class MainMenu extends LitElement {
       "mouseleave",
       this._handleMenuLeave.bind(this)
     );
-    console.log(window.location.pathname, new URLSearchParams());
-    this.currentLocation = window.location.pathname;
+  }
+
+  private _handleMenuVisible() {
+    switch (true) {
+      case this.companiesMenuVisible:
+        return html`
+          <ul class="menu-list">
+            <li><a href="/service.html">Company Service 1</a></li>
+            <li><a href="/service.html">Company Service 2</a></li>
+            <li><a href="/service.html">Company Service 3</a></li>
+          </ul>
+        `;
+      case this.individualsMenuVisible:
+        return html`
+          <ul class="menu-list">
+            <li><a href="/service.html">Individuals Service 1</a></li>
+            <li><a href="/service.html">Individuals Service 2</a></li>
+            <li><a href="/service.html">Individuals Service 3</a></li>
+            <li><a href="/service.html">Individuals Service 4</a></li>
+            <li><a href="/service.html">Individuals Service 5</a></li>
+          </ul>
+        `;
+      case this.reviewsMenuVisible:
+        return html`
+          <ul class="menu-list">
+            <li><a href="/service.html">Reviews 1</a></li>
+            <li><a href="/service.html">Reviews 2</a></li>
+            <li><a href="/service.html">Reviews 3</a></li>
+          </ul>
+        `;
+      default:
+        return html`
+          <ul class="menu-list">
+            <li><a href="/service.html">Contacts 1</a></li>
+            <li><a href="/service.html">Contacts 2</a></li>
+            <li><a href="/service.html">Contacts 3</a></li>
+          </ul>
+        `;
+    }
   }
 
   private _handleMenuLeave() {
     this.menuOpened = false;
     this.companiesMenuVisible = false;
-    console.log("close menu");
+    this.individualsMenuVisible = false;
+    this.reviewsMenuVisible = false;
+    this.contactsMenuVisible = false;
   }
 
   private _handleMenuHover(key: string) {
-    this.menuOpened = true;
     switch (key) {
       case "companies":
+        this.menuOpened = true;
         this.companiesMenuVisible = true;
+        this.individualsMenuVisible = false;
+        this.reviewsMenuVisible = false;
+        this.contactsMenuVisible = false;
         break;
       case "individuals":
-        console.log("this is individuals");
+        this.menuOpened = true;
+        this.individualsMenuVisible = true;
+        this.companiesMenuVisible = false;
+        this.reviewsMenuVisible = false;
+        this.contactsMenuVisible = false;
         break;
       case "reviews":
-        console.log("this is reviews");
+        this.menuOpened = true;
+        this.reviewsMenuVisible = true;
+        this.companiesMenuVisible = false;
+        this.individualsMenuVisible = false;
+        this.contactsMenuVisible = false;
         break;
       case "contacts":
-        console.log("this is contacts");
+        this.menuOpened = true;
+        this.contactsMenuVisible = true;
+        this.companiesMenuVisible = false;
+        this.individualsMenuVisible = false;
+        this.reviewsMenuVisible = false;
         break;
       default:
-        console.log("this is home");
+        this.menuOpened = false;
+        this.contactsMenuVisible = false;
+        this.companiesMenuVisible = false;
+        this.individualsMenuVisible = false;
+        this.reviewsMenuVisible = false;
     }
   }
 
@@ -160,10 +246,6 @@ export class MainMenu extends LitElement {
     );
     super.disconnectedCallback();
   }
-
-  // updated() {
-  //   debugger;
-  // }
 
   static styles = css`
     header {
