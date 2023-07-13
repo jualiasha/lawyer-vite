@@ -9,7 +9,6 @@ export class Home extends LitElement {
     return html`
       <main-menu></main-menu>
       <main>
-        <h1>Super awesome welcome chat</h1>
         <chat-helper></chat-helper>
       </main>
       <footer>Copywrite 2023</footer>
