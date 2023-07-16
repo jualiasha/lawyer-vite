@@ -1,4 +1,4 @@
-import { css, html, LitElement, PropertyValues, TemplateResult } from "lit";
+import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import { Marked } from "@ts-stack/markdown";
 
@@ -8,26 +8,24 @@ export class Chat extends LitElement {
    * Chat introduction text.
    */
   @property({ type: Object })
-  _introduction: TemplateResult = html``;
+  _introduction: string = ``;
 
   connectedCallback() {
     super.connectedCallback();
     const self = this;
+    // @ts-ignore
     import("../assets/content/chat-introduction.md").then((res) => {
       fetch(res.default)
         .then((response) => response.text())
         .then((text) => {
-          self._introduction = html`${Marked.parse(text)}`;
+          self._introduction = Marked.parse(text);
         });
     });
   }
 
   protected willUpdate(_changedProperties: PropertyValues) {
     console.log(_changedProperties, this._introduction);
-    if (
-      _changedProperties.has("_introduction") &&
-      this._introduction.values[0]
-    ) {
+    if (_changedProperties.has("_introduction") && this._introduction.length) {
       this.type("#introduction", this._introduction);
     }
   }
@@ -41,7 +39,7 @@ export class Chat extends LitElement {
     `;
   }
 
-  public type(selector: string, htmlTemplate: TemplateResult) {
+  public type(selector: string, mdTemplate: string) {
     // Get the paragraph element
     const typingText: HTMLElement | null =
       this.renderRoot.querySelector(selector);
@@ -49,15 +47,13 @@ export class Chat extends LitElement {
     const speed = 10;
     // debugger;
     const typeWriter = (): void => {
-      // @ts-ignore
-      const typedString: string = htmlTemplate.values[0];
       // Check if all HTML template has been typed
-      if (index < typedString.length && typingText) {
+      if (index < mdTemplate.length && typingText) {
         // Append next character to the paragraph element
-        if (index === typedString.length - 1) {
-          typingText.innerHTML = `${typedString.substring(0, index + 1)}`;
+        if (index === mdTemplate.length - 1) {
+          typingText.innerHTML = `${mdTemplate.substring(0, index + 1)}`;
         } else {
-          typingText.innerHTML = `${typedString.substring(
+          typingText.innerHTML = `${mdTemplate.substring(
             0,
             index + 1
           )}<span class="cursor">&nbsp;</span>`;
@@ -93,7 +89,7 @@ export class Chat extends LitElement {
       width: 10px;
       animation: blink 1s infinite;
     }
-    .cursor.typing-finnished {
+    .cursor.typing-finished {
       animation: none;
     }
     @keyframes blink {
