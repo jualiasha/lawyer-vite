@@ -133,6 +133,7 @@ export class Chat extends LitElement {
         <div id="introduction" class="block"></div>
         <div id="helper" class="block"></div>
       </div>
+      <img alt="emblem" src="/emblem.png" />
     `;
   }
 
@@ -231,6 +232,13 @@ export class Chat extends LitElement {
     }
     a:hover {
       color: var(--lawyer-yellow);
+    }
+    img {
+      position: absolute;
+      width: 15rem;
+      bottom: 5rem;
+      right: 42%;
+      opacity: 0.3;
     }
   `;
 }
