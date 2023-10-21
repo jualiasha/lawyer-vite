@@ -1,15 +1,27 @@
 import { LitElement, css, html } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 import "../components/MainMenu.ts";
 import "../components/Chat.ts";
+import { classMap } from "lit/directives/class-map.js";
 
 @customElement("home-page")
 export class Home extends LitElement {
+  /**
+   * Toggling of open and close main menu.
+   */
+  @property({ type: Boolean })
+  mainMenuOpened: boolean = false;
   render() {
+    const mainClasses = {
+      blur: this.mainMenuOpened,
+    };
     return html`
-      <main-menu></main-menu>
-      <main>
-        <h1>Super awesome welcome chat</h1>
+      <main-menu
+        @main-menu-toggle=${(e: CustomEvent) => {
+          this.mainMenuOpened = e.detail.menuOpened;
+        }}
+      ></main-menu>
+      <main class="${classMap(mainClasses)}">
         <chat-helper></chat-helper>
       </main>
       <footer>Copywrite 2023</footer>
@@ -23,6 +35,13 @@ export class Home extends LitElement {
     }
     main {
       margin-top: 3rem;
+    }
+    footer {
+      text-align: center;
+    }
+    .blur {
+      filter: blur(5px);
+      pointer-events: none;
     }
   `;
 }
