@@ -1,6 +1,7 @@
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { Marked } from "@ts-stack/markdown";
+import { when } from "lit/directives/when.js";
 
 const speed: number = 10;
 
@@ -11,7 +12,7 @@ interface IChoice {
 
 interface IChatHelper {
   start: string;
-  firstChoice: { id: string; options: string };
+  firstChoice: { options: string };
   fizOsoby: IChoice[];
   jurOsoby: IChoice[];
 }
@@ -21,18 +22,24 @@ export class Chat extends LitElement {
   /**
    * Chat introduction text.
    */
-  @property({ type: Object })
+  @property({ type: String })
   _introduction: string = ``;
   /**
    * Chat firstChoice text.
    */
-  @property({ type: Object })
+  @property({ type: String })
   _firstChoice: string = ``;
   /**
    * Chat firstChoice rendered toggle.
    */
-  @property({ type: Object })
+  @property({ type: Boolean })
   _firstChoiceRendered: boolean = false;
+
+  /**
+   * Chat introduction rendered toggle.
+   */
+  @property({ type: Boolean })
+  _introductionRendered: boolean = false;
 
   @state()
   private _helper: IChatHelper = {
@@ -40,11 +47,10 @@ export class Chat extends LitElement {
       "<h2> Яка послуга вас цікавить?</h2> <ul id='firstChoice'></ul> "
     ),
     firstChoice: {
-      id: "fizOsoby",
       options:
-        "<li>Послуги для фізичних осіб</li>" +
-        "<li>Послуги для компаній</li>" +
-        "<div class='nextChoice'></div>",
+        "<li id='fizOsoby'>Послуги для фізичних осіб</li>" +
+        "<li id='jurOsoby'>Послуги для компаній</li>" +
+        "<ul id='secondChoice'></ul>",
     },
     fizOsoby: [
       { id: "fizPosluga1", name: "Послуги для фізичних осіб 1" },
@@ -90,6 +96,22 @@ export class Chat extends LitElement {
     );
   }
 
+  private handleSecondOptionChoice() {
+    let secondChoiceMD: string = ``;
+    if (this._firstChoice === "fizOsoby") {
+      this._helper.fizOsoby.forEach((option) => {
+        const concatenatedString: string = `<li id='${option.id}'>${option.name}</li>`;
+        return (secondChoiceMD = secondChoiceMD + concatenatedString);
+      });
+    } else {
+      this._helper.jurOsoby.forEach((option) => {
+        const concatenatedString: string = `<li id='${option.id}'>${option.name}</li>`;
+        return (secondChoiceMD = secondChoiceMD + concatenatedString);
+      });
+    }
+    this.type("#secondChoice", secondChoiceMD);
+  }
+
   protected async willUpdate(_changedProperties: PropertyValues) {
     console.log(_changedProperties);
     if (_changedProperties.has("_introduction") && this._introduction.length) {
@@ -104,11 +126,14 @@ export class Chat extends LitElement {
     ) {
       const firstChoiceLi = this.renderRoot.querySelectorAll("#firstChoice li");
       console.log(firstChoiceLi);
-      firstChoiceLi.forEach((li) =>
-        li.addEventListener("click", (e: Event) =>
-          this.handleFirstChoiceLiClick(e)
-        )
-      );
+      firstChoiceLi.forEach((li) => {
+        li.addEventListener("click", () =>
+          this.handleFirstChoiceLiClick(li.id)
+        );
+      });
+    }
+    if (_changedProperties.has("_firstChoice") && this._firstChoice) {
+      this.handleSecondOptionChoice();
     }
   }
 
@@ -121,8 +146,9 @@ export class Chat extends LitElement {
     `;
   }
 
-  private handleFirstChoiceLiClick(e: Event) {
-    console.log(e);
+  private handleFirstChoiceLiClick(identifier: string) {
+    console.log(identifier);
+    this._firstChoice = identifier;
   }
 
   public type(selector: string, mdTemplate: string) {
@@ -177,8 +203,8 @@ export class Chat extends LitElement {
       animation: none;
     }
     #firstChoice {
-      display: flex;
-      justify-content: space-between;
+      //display: flex;
+      //justify-content: space-between;
       font-size: 1.6rem;
       list-style-type: circle;
       cursor: pointer;
