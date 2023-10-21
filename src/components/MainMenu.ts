@@ -59,6 +59,16 @@ export class MainMenu extends LitElement {
     }
   }
 
+  protected willUpdate(_changedProperties: PropertyValues) {
+    if (_changedProperties.has("menuOpened")) {
+      this.dispatchEvent(
+        new CustomEvent("main-menu-toggle", {
+          detail: { menuOpened: this.menuOpened },
+        })
+      );
+    }
+  }
+
   render() {
     const openMenuClasses = {
       "menu-visible": this.menuOpened,
@@ -356,6 +366,7 @@ export class MainMenu extends LitElement {
       width: 100%;
       background-color: var(--white);
       animation: backgroundMoveForward 50ms ease-in 0s;
+      z-index: 600;
     }
     .menu-hidden {
       position: absolute;

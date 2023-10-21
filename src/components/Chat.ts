@@ -1,7 +1,6 @@
 import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { Marked } from "@ts-stack/markdown";
-import { when } from "lit/directives/when.js";
 
 const speed: number = 10;
 
@@ -35,34 +34,27 @@ export class Chat extends LitElement {
   @property({ type: Boolean })
   _firstChoiceRendered: boolean = false;
 
-  /**
-   * Chat introduction rendered toggle.
-   */
-  @property({ type: Boolean })
-  _introductionRendered: boolean = false;
-
   @state()
   private _helper: IChatHelper = {
     start: Marked.parse(
-      "<h2> Яка послуга вас цікавить?</h2> <ul id='firstChoice'></ul> "
+      "<h2> Яка послуга вас цікавить?</h2> <ul id='firstChoice'></ul> <ul id='secondChoice'></ul> "
     ),
     firstChoice: {
       options:
         "<li id='fizOsoby'>Послуги для фізичних осіб</li>" +
-        "<li id='jurOsoby'>Послуги для компаній</li>" +
-        "<ul id='secondChoice'></ul>",
+        "<li id='jurOsoby'>Послуги для компаній</li>",
     },
     fizOsoby: [
       { id: "fizPosluga1", name: "Послуги для фізичних осіб 1" },
       { id: "fizPosluga2", name: "Послуги для фізичних осіб 2" },
       { id: "fizPosluga3", name: "Послуги для фізичних осіб 3" },
-      { id: "fizPosluga4", name: "Задати індивідуальне питання" },
+      { id: "fizOsoby-pytannia", name: "Задати індивідуальне питання" },
     ],
     jurOsoby: [
       { id: "jurPosluga1", name: "Послуги для компаній 1" },
       { id: "jurPosluga2", name: "Послуги для компаній 2" },
       { id: "jurPosluga3", name: "Послуги для компаній 3" },
-      { id: "jurPosluga4", name: "Задати індивідуальне питання" },
+      { id: "jurOsoby-pytannia", name: "Задати індивідуальне питання" },
     ],
   };
 
@@ -100,12 +92,12 @@ export class Chat extends LitElement {
     let secondChoiceMD: string = ``;
     if (this._firstChoice === "fizOsoby") {
       this._helper.fizOsoby.forEach((option) => {
-        const concatenatedString: string = `<li id='${option.id}'>${option.name}</li>`;
+        const concatenatedString: string = `<li id='${option.id}'><a href="/service.html">${option.name}</a></li>`;
         return (secondChoiceMD = secondChoiceMD + concatenatedString);
       });
     } else {
       this._helper.jurOsoby.forEach((option) => {
-        const concatenatedString: string = `<li id='${option.id}'>${option.name}</li>`;
+        const concatenatedString: string = `<li id='${option.id}'><a href="/service.html">${option.name}</a></li>`;
         return (secondChoiceMD = secondChoiceMD + concatenatedString);
       });
     }
@@ -113,7 +105,6 @@ export class Chat extends LitElement {
   }
 
   protected async willUpdate(_changedProperties: PropertyValues) {
-    console.log(_changedProperties);
     if (_changedProperties.has("_introduction") && this._introduction.length) {
       await this.type("#introduction", this._introduction);
       const helperTimeOut = speed * 1.1 * this._introduction.length;
@@ -125,7 +116,6 @@ export class Chat extends LitElement {
       this._firstChoiceRendered
     ) {
       const firstChoiceLi = this.renderRoot.querySelectorAll("#firstChoice li");
-      console.log(firstChoiceLi);
       firstChoiceLi.forEach((li) => {
         li.addEventListener("click", () =>
           this.handleFirstChoiceLiClick(li.id)
@@ -147,7 +137,6 @@ export class Chat extends LitElement {
   }
 
   private handleFirstChoiceLiClick(identifier: string) {
-    console.log(identifier);
     this._firstChoice = identifier;
   }
 
@@ -203,11 +192,21 @@ export class Chat extends LitElement {
       animation: none;
     }
     #firstChoice {
-      //display: flex;
-      //justify-content: space-between;
+      display: flex;
+      justify-content: space-between;
       font-size: 1.6rem;
-      list-style-type: circle;
       cursor: pointer;
+    }
+    #firstChoice li::marker {
+      color: var(--lawyer-yellow);
+    }
+    #secondChoice {
+      list-style-type: circle;
+      font-size: 1.6rem;
+      cursor: pointer;
+    }
+    #secondChoice li::marker {
+      color: var(--lawyer-yellow);
     }
     @keyframes blink {
       0% {
@@ -225,6 +224,13 @@ export class Chat extends LitElement {
       100% {
         background-color: #ccc;
       }
+    }
+    a {
+      text-decoration: none;
+      color: var(--white);
+    }
+    a:hover {
+      color: var(--lawyer-yellow);
     }
   `;
 }
